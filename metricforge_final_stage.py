@@ -9,6 +9,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 
+# Constants recovered from public evidence and IAM role conditions.
 ACCOUNT = "125746528491"
 REGION = "ap-northeast-2"
 
